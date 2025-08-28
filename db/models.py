@@ -64,9 +64,8 @@ class Order(models.Model):
     class Meta:
         ordering = ["-created_at"]
 
-
-    def __str__(self) -> str:
-        return f"{self.created_at}"
+    def __str__(self):
+        return str(self.created_at)
 
 
 class Ticket(models.Model):
@@ -81,13 +80,22 @@ class Ticket(models.Model):
             UniqueConstraint(fields=["row", "seat", "movie_session"], name="unique_row_seat"),
         ]
 
-
     def __str__(self) -> str:
-        return f"{self.movie_session.movie.title} {self.movie_session.show_time} (row: {self.row}, seat: {self.seat})"
+        try:
+            return f"{self.movie_session.movie.title} {self.movie_session.show_time} (row: {self.row}, seat: {self.seat})"
+        except AttributeError:
+            return "Invalid ticket"
 
     def clean(self) -> None:
+        seats_in_row = self.movie_session.cinema_hall.seats_in_row
+        rows = self.movie_session.cinema_hall.rows
+        errors = {}
+
         if self.seat < 1 or self.seat > self.movie_session.cinema_hall.seats_in_row:
-            raise ValidationError({"seat": "seat number must be in available range: (1, seats_in_row): (1, 12)"})
+            raise ValidationError({
+                "seat": [
+                    f"seat number must be in available range: (1, seats_in_row): (1, {self.movie_session.cinema_hall.seats_in_row})"]
+            })
         if self.row < 1 or self.row > self.movie_session.cinema_hall.rows:
             raise ValidationError({
                 "row": [f"row number must be in available range: (1, rows): (1, {self.movie_session.cinema_hall.rows})"]
