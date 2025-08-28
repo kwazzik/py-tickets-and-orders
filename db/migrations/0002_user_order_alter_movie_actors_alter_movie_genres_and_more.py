@@ -47,7 +47,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL, related_name='orders')),
             ],
             options={
                 'ordering': ['-created_at'],
@@ -84,8 +84,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('row', models.IntegerField()),
                 ('seat', models.IntegerField()),
-                ('movie_session', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='db.moviesession')),
-                ('order', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='db.order')),
+                ('movie_session', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='db.moviesession', related_name="movie_ticket")),
+                ('order', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='db.order', related_name="tickets")),
             ],
         ),
         migrations.AddConstraint(
